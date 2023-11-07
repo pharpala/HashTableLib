@@ -86,6 +86,7 @@ HashIndex hashByLength(AAKeyType key, size_t keyLength, HashIndex size)
  *  param  size boundary for range of allowable return values
  *  return      integer index associated with key
  */
+
 HashIndex hashBySum(AAKeyType key, size_t keyLength, HashIndex size)
 {
 	HashIndex sum = 0;
@@ -94,12 +95,17 @@ HashIndex hashBySum(AAKeyType key, size_t keyLength, HashIndex size)
 	 * TO DO: you will need to implement a summation based
 	 * hashing algorithm here, using a sum-of-bytes
 	 * strategy such as that discussed in class.  Take
-	 * a look at HashByLength if you want an example
+	 * a look at HashByLength if you want an example 
 	 * of a "working" (but not very smart) hashing
 	 * algorithm.
 	 */
 
-	return sum;
+	for(int i = 0; i<keyLength; i++)
+	{
+		sum += (HashIndex)key[i];
+	}
+
+	return sum % size;
 }
 
 
@@ -119,6 +125,8 @@ HashIndex hashBySum(AAKeyType key, size_t keyLength, HashIndex size)
  *
  *  @see    HashProbe
  */
+
+
 HashIndex linearProbe(AssociativeArray *hashTable,
 		AAKeyType key, size_t keylength,
 		int index, int invalidEndsSearch, int *cost
@@ -144,7 +152,26 @@ HashIndex linearProbe(AssociativeArray *hashTable,
 	 * strategy, such as that discussed in class.
 	 */
 
-	return index;
+	while(1)
+	{
+		KeyDataPair *pair = &hashTable->table[index];
+
+        //check if the current slot is empty or deleted
+        if (pair->validity == 0 || pair->validity == 2) {
+            return index;  //empty or deleted slot
+        }
+
+        //check if the current slot is invalid and end the search
+        if (invalidEndsSearch && pair->validity == 1) 
+		{
+            return -1;  //search should end
+        }	
+
+		index++;
+		(*cost)++;
+	}
+
+	return -1;
 }
 
 
@@ -189,6 +216,27 @@ HashIndex quadraticProbe(AssociativeArray *hashTable, AAKeyType key, size_t keyl
 	 * strategy, such as that discussed in class.
 	 */
 
+
+	while(1)
+	{
+		KeyDataPair *pair = &hashTable->table[startIndex];
+
+        //check if the current slot is empty or marked as deleted
+        if (pair->validity == 0 || pair->validity == 2) 
+		{
+            return startIndex;  //found an empty or deleted slot
+        }
+
+        //check if the current slot is invalid and end the search
+        if (invalidEndsSearch && pair->validity == 1) 
+		{
+            return -1;  // Search should end
+        }	
+
+		startIndex= startIndex*startIndex;
+		(*cost)++;
+	}
+
 	return -1;
 }
 
@@ -224,6 +272,25 @@ HashIndex doubleHashProbe(AssociativeArray *hashTable, AAKeyType key, size_t key
 	 * the above strategies.
 	 */
 
+	while(1)
+	{
+		KeyDataPair *pair = &hashTable->table[startIndex];
+
+        //check if current slot is empty or deleted
+        if (pair->validity == 0 || pair->validity == 2) 
+		{
+            return startIndex;  //empty or deleted slot
+        }
+
+        // Check if the current slot is invalid and should end the search
+        if (invalidEndsSearch && pair->validity == 1) 
+		{
+            return -1;  // Search should end
+        }	
+
+		startIndex = hashTable->hashAlgorithmSecondary(key, keylen, hashTable->size);
+		(*cost)++;
+	}
+
 	return -1;
 }
-

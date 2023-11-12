@@ -107,6 +107,17 @@ HashIndex hashBySum(AAKeyType key, size_t keyLength, HashIndex size)
 	return sum % size;
 }
 
+HashIndex hashByXOR(AAKeyType key, size_t keyLength, HashIndex size)
+{
+	HashIndex value = 0;
+
+	for(int i = 0; i<keyLength; i++)
+	{
+		value ^= (HashIndex)key[i];
+	}
+	return value % size;
+}
+
 
 /**
  * Locate an empty position in the given array, starting the

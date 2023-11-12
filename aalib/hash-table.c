@@ -140,8 +140,9 @@ static HashAlgorithm lookupNamedHashStrategy(const char *name)
 		return hashBySum;
 	} else if (strncmp(name, "len", 3) == 0) {
 		return hashByLength;
-
 		// TO DO: add in your own strategy here
+	} else if (strncmp(name, "xor", 3)==0){
+		return hashByXOR;
 	}
 
 	fprintf(stderr, "Invalid hash strategy '%s' - using 'sum'\n", name);

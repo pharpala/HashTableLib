@@ -30,6 +30,7 @@ loadAssociativeArray(AssociativeArray *assocArray, char *filename, int useIntKey
 	}
 
 	while (readDataLine(fp, linebuffer, LINE_MAX, &strkey, &value) > 0) {
+		
 		if (useIntKey && isdigit(strkey[0])) {
 			if (sscanf(strkey, "%d", &intkey) != 1) {
 				fprintf(stderr, "Error: Failed extracting integer from '%s'\n", strkey);
@@ -311,4 +312,3 @@ main(int argc, char **argv)
 	/* exit with success if we get here */
 	return 0;
 }
-

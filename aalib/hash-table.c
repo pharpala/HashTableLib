@@ -43,7 +43,7 @@ aaCreateAssociativeArray(
 	newTable->hashAlgorithmPrimary = lookupNamedHashStrategy(hashPrimary);
 	newTable->hashNamePrimary = strdup(hashPrimary);
 	newTable->hashAlgorithmSecondary = lookupNamedHashStrategy(hashSecondary);
-	newTable->hashNameSecondary = strdup(hashPrimary);
+	newTable->hashNameSecondary = strdup(hashSecondary);
 	newTable->hashProbe = lookupNamedProbingStrategy(probingStrategy);
 	newTable->probeName = strdup(probingStrategy);
 
@@ -82,15 +82,24 @@ aaDeleteAssociativeArray(AssociativeArray *aarray)
 	 * responsibility of the user
 	 */
 
-	 if (aarray == NULL) 
-	{
-        return; //nothing to delete
+	if (aarray == NULL) 
+    {
+        return; // nothing to delete
     }
 
     //free dynamically allocated strings
     free(aarray->hashNamePrimary);
     free(aarray->hashNameSecondary);
     free(aarray->probeName);
+
+    //free memory for keys and values
+    for (int i = 0; i < aarray->size; i++) 
+	{
+        if (aarray->table[i].validity == HASH_USED) 
+		{
+            free(aarray->table[i].key);
+        }
+    }
 
     //free table of KeyDataPairs
     free(aarray->table);
@@ -170,39 +179,51 @@ int aaInsert(AssociativeArray *aarray, AAKeyType key, size_t keylen, void *value
 	 * If a suitable location is found, we then initialize that
 	 * slot with the new key and data
 	 */
+    // Initialize the cost counter
+	// Compute the initial hash index using the primary hash function
+    HashIndex index = aarray->hashAlgorithmPrimary(key, keylen, aarray->size);
+    
+    // Initialize insert cost and record the initial index
+	int cost =0;
+    HashIndex initialindex = index;
 
-
-	int index = aarray->hashProbe(aarray, key, keylen, 0, 0, &aarray->insertCost);
-
-    if (index < 0) 
-	{
-        fprintf(stderr, "Failed to insert key-value pair. Hash table is full.\n");
-        return -1;
+    // Allocate memory for a copied key
+    AAKeyType copiedKey = malloc(keylen + 1);
+    if (copiedKey == NULL) {
+        return -1; // Memory allocation failure
     }
 
-	while(1)
-	{
-		// Check if the current slot is empty or marked as deleted
-		KeyDataPair *pair = &aarray->table[index];
-		if (pair->validity == 0 || pair->validity == 2) 
-		{
-			// Initialize the slot with the new key and value
-			pair->key = key;
-			pair->keylen = keylen;
-			pair->value = value;
-			pair->validity = 0; // Set it as a valid entry
-			aarray->nEntries++;
-			
-			return index;
-		}
-	 
-	
-		index = aarray->hashAlgorithmSecondary(key, keylen, aarray->size);
-		aarray->insertCost++;
+    // Copy the key and null-terminate the copied key
+    memcpy(copiedKey, key, keylen);
 
-    	return index; // Return the index where the data is placed within the hash table
-	}
+    while (1) {
+        // Check if the current slot is empty (0) or has a tombstone (-1).
+        if (aarray->table[index].validity == HASH_EMPTY || aarray->table[index].validity == HASH_DELETED) {
+            // Insert the key, value, and update metadata
+            aarray->table[index].key = copiedKey;
+            aarray->table[index].keylen = keylen;
+            aarray->table[index].value = value;
+            aarray->table[index].validity = HASH_USED;
+            aarray->nEntries++;
+			cost++;
+			aarray->insertCost += cost;
+            
+            // Update insert cost and free the copied key memory before returning
+            return index;
+        }
+
+        // Use the hash probing strategy to find the next available slot
+        index = aarray->hashProbe(aarray, key, keylen, index, 1, &aarray->insertCost);
+
+        // If we have cycled through the entire table and haven't found an empty slot, return -1
+        if (index == initialindex) {
+			aarray->insertCost += cost;
+            return -1;
+        }
+    }
+	free(copiedKey);
 }
+
 
 
 /**
@@ -214,50 +235,52 @@ int aaInsert(AssociativeArray *aarray, AAKeyType key, size_t keylen, void *value
  *				 was present in the table, or NULL, if it was not
  *  @see         KeyDataPair
  */
-void *aaLookup(AssociativeArray *aarray, AAKeyType key, size_t keylen
-	)
+void *aaLookup(AssociativeArray *aarray, AAKeyType key, size_t keylen)
 {
 	/**
 	 * TO DO: perform a similar search to the insert, but here a
 	 * deleted location means we have not found the key
 	 */
 
-	int index = aarray->hashProbe(aarray, key, keylen, 0, 0, &aarray->searchCost);
-    int size = aarray->size;
+    HashIndex index = aarray->hashAlgorithmPrimary(key, keylen, aarray->size);
+    int startIndex = index;
+    int cost = 0;
 
-    if (index < 0) 
-	{
-        return NULL; // Table is full or no available slot found
-    }
-
-    while (1) 
-	{
-        KeyDataPair *pair = &aarray->table[index];
-
-        // Check if the current slot is empty
-        if (pair->validity == 0) 
-		{
-            return NULL; // Key is not in the table
-        }
-
+    while (aarray->table[index].validity != HASH_EMPTY) 
+    {
         // Check if the current slot is marked as deleted
-        if (pair->validity == 2) 
-		{
-            //means the key is not in the table
+        if (aarray->table[index].validity == HASH_DELETED) 
+        {
+            // This means the key is not in the table
             index++;
-            aarray->searchCost++; // Increase the probing cost
+			cost++;
+			aarray->searchCost+= cost;
+            if (index == startIndex) 
+            {
+                return NULL; // The entire table has been searched, key not found
+            }
             continue;
         }
 
         // Check if the current slot matches the key
-        if (pair->keylen == keylen && memcmp(pair->key, key, keylen) == 0) 
-		{
-            return pair->value; //key found so return the associated value
+        if (aarray->table[index].keylen == keylen && memcmp(aarray->table[index].key, key, keylen) == 0) 
+        {
+            return aarray->table[index].value; // Key found, return the associated value
         }
 
-        index = aarray->hashAlgorithmSecondary(key, keylen, size);
-        aarray->searchCost++; // Increase the probing cost
+        // If the current slot doesn't match the key, handle collision
+        //use the same probing strategy as in aaInsert to find the next slot
+        index++;
+		cost++;
+		aarray->searchCost+= cost;
+        if (index == startIndex) 
+        {
+            return NULL; // The entire table has been searched, key not found
+        }
     }
+
+    // Key not found
+    return NULL;
 }
 
 
@@ -281,45 +304,56 @@ void *aaDelete(AssociativeArray *aarray, AAKeyType key, size_t keylen)
 	 * Implement a deletion algorithm based on tombstones,
 	 * as described in class
 	 */
+ HashIndex index = aarray->hashAlgorithmPrimary(key, keylen, aarray->size);
+    int startIndex = index;
+    int cost = 0;
 
-	int index = aarray->hashProbe(aarray, key, keylen, 0, 0, &aarray->searchCost);
-    int size = aarray->size;
-
-    if (index < 0) {
-        return NULL; // Table is full or no available slot found
-    }
-
-    while (1) {
-        KeyDataPair *pair = &aarray->table[index];
-
-        // Check if the current slot is empty
-        if (pair->validity == 0) 
-		{
-            return NULL; // Key is not in the table
-        }
-
-        // Check if slot is marked as deleted
-        if (pair->validity == 2) 
-		{
+    while (aarray->table[index].validity != HASH_EMPTY) 
+    {
+        // Check if the current slot is marked as deleted
+        if (aarray->table[index].validity == HASH_DELETED) 
+        {
+            // This means the key is not in the table
             index++;
-            aarray->searchCost++; // Increase the probing cost
+			cost++;
+			aarray->deleteCost += cost;
+			printf("THIS IS THE COST ****%d***\n", aarray->deleteCost);
+            if (index == startIndex) 
+            {
+                return NULL; // The entire table has been searched, key not found
+            }
             continue;
         }
 
-        //check if the current slot matches key
-        if (pair->keylen == keylen && memcmp(pair->key, key, keylen) == 0) 
-		{
-            //key found so mark it tombstone
-            pair->validity = 2;
-            aarray->nEntries--; //decrement number of entries
-            return pair->value; //return associated value 
+        // Check if the current slot matches the key
+        if (aarray->table[index].keylen == keylen && memcmp(aarray->table[index].key, key, keylen) == 0) 
+        {
+            // Mark the slot as deleted (tombstone)
+            aarray->table[index].validity = HASH_DELETED;
+            aarray->nEntries--;
+            cost++;
+            aarray->deleteCost += cost;
+			printf("THIS IS THE COST ****%d***\n", aarray->deleteCost);
+
+            // Free memory for keys when deleting or resizing the table
+            free(aarray->table[index].key);
+
+            return aarray->table[index].value; // Return the associated value
         }
 
-        index= aarray->hashAlgorithmSecondary(key, keylen, size);
-        aarray->searchCost++;
+        // If the current slot doesn't match the key, handle collision (optional):
+        // You can use the same probing strategy as in aaInsert to find the next slot
+        index++;
+		cost++;
+		aarray->deleteCost += cost;
+        if (index == startIndex) 
+        {
+            return NULL; // The entire table has been searched, key not found
+        }
     }
 
-	return NULL;
+    // Key not found
+    return NULL;
 }
 
 /**

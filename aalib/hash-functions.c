@@ -104,7 +104,6 @@ HashIndex hashBySum(AAKeyType key, size_t keyLength, HashIndex size)
 	{
 		sum += (HashIndex)key[i];
 	}
-
 	return sum % size;
 }
 
@@ -151,27 +150,21 @@ HashIndex linearProbe(AssociativeArray *hashTable,
 	 * For this routine, implement a "linear" probing
 	 * strategy, such as that discussed in class.
 	 */
+    // Initial step size for linear probing (1 means moving to the next slot)
+    int start = index;
 
-	while(1)
+    while (hashTable->table[start].validity != 0 && (invalidEndsSearch || hashTable->table[start].validity == 2)) 
 	{
-		KeyDataPair *pair = &hashTable->table[index];
+        start = (start + 1) % hashTable->size;
+        (*cost)++;
 
-        //check if the current slot is empty or deleted
-        if (pair->validity == 0 || pair->validity == 2) {
-            return index;  //empty or deleted slot
-        }
-
-        //check if the current slot is invalid and end the search
-        if (invalidEndsSearch && pair->validity == 1) 
+        if (start == index) 
 		{
-            return -1;  //search should end
-        }	
-
-		index++;
-		(*cost)++;
-	}
-
-	return -1;
+            fprintf(stderr, "Hash table full\n");
+            return -1;
+        }
+    }
+	return start;
 }
 
 
@@ -217,27 +210,20 @@ HashIndex quadraticProbe(AssociativeArray *hashTable, AAKeyType key, size_t keyl
 	 */
 
 
-	while(1)
+    int start = startIndex;
+
+    while (hashTable->table[start].validity != 0 && (invalidEndsSearch || hashTable->table[start].validity == 2)) 
 	{
-		KeyDataPair *pair = &hashTable->table[startIndex];
+        start = (start *2) % hashTable->size;
+        (*cost)++;
 
-        //check if the current slot is empty or marked as deleted
-        if (pair->validity == 0 || pair->validity == 2) 
+        if (start == startIndex) 
 		{
-            return startIndex;  //found an empty or deleted slot
+            fprintf(stderr, "Hash table full\n");
+            return -1;
         }
-
-        //check if the current slot is invalid and end the search
-        if (invalidEndsSearch && pair->validity == 1) 
-		{
-            return -1;  // Search should end
-        }	
-
-		startIndex= startIndex*startIndex;
-		(*cost)++;
-	}
-
-	return -1;
+    }
+	return start;
 }
 
 

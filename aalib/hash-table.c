@@ -318,7 +318,6 @@ void *aaDelete(AssociativeArray *aarray, AAKeyType key, size_t keylen)
             index++;
 			cost++;
 			aarray->deleteCost += cost;
-			printf("THIS IS THE COST ****%d***\n", aarray->deleteCost);
             if (index == startIndex) 
             {
                 return NULL; // The entire table has been searched, key not found
@@ -334,7 +333,6 @@ void *aaDelete(AssociativeArray *aarray, AAKeyType key, size_t keylen)
             aarray->nEntries--;
             cost++;
             aarray->deleteCost += cost;
-			printf("THIS IS THE COST ****%d***\n", aarray->deleteCost);
 
             // Free memory for keys when deleting or resizing the table
             free(aarray->table[index].key);

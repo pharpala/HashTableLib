@@ -1,24 +1,47 @@
-Pranay Raju Harpalani Dubey
-1249973
+# Hash Table Library
 
-This assignment implements code from the files "data-reader.c", "mainline.c" and "primes.c". The changes made are on files "hash-table.c" and "hash-functions.c". Its dependencies are:
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <ctype.h> 
-#include "hashtools.h"
+## Abstraction
 
-The code shows the implementation of 3 algorithms in a hash Table that has been tested to check their cost and effectiveness.
+This library provides a back-end Hash Table for efficiently handling data insertion, querying, and deletion from the terminal.
 
-The first one is a hash by length, given by the professor, which performs poorly. Due to the length of the key always being a small number compared to the size of the table, we will always have collisions between the first spaces in our hash table.
+## Summary
 
-The second one is a hash by sum, given in the lecture slides, which performs quite well. The function sums all the bytes up and then mods it by the size of the table, since the sum is a great value, when modding it by the size we will be able to receive a number anywhere in between the table which is great! 
+The primary objective of this program is to offer programmers a convenient header file containing a pre-built Hash Table, eliminating the need for manual code implementation. Similar to Object Oriented Programming's inheritance concept, this program functions as a parent class, allowing users to utilize all methods (in C, functions) without delving into the underlying mechanics. Adopting the principles of "information hiding," the code exposes only the essential information needed for utilizing the provided tools, keeping implementation details concealed within the code library.
 
-The third one is a hash by xor, made by me, which performs the same as sum. This function just sums the byte values up and mods it, but the twist is that it flips the bits, therefore we get a number we would normally not expect or be able to decipher easily, as it is using the keys bits, we will get the same key for the same value. The cost is similar to sum, as if two numbers produce the same hash value in the sum, once we flip the bits of those numbers we may still get the same value, it will depend on the size of the table, so we should be filling up the table. Ideally, this will avoid clusters but that will depend on our data. Finally, this algorithm will result in a cost similar to hash by sum, but with a little fun twist and a tougher to decipher key.
+## Algorithms
+
+The library supports three algorithms:
+
+1. **Hash by Length:**
+   - Performance: Generally poor.
+   - Description: The algorithms return value is the data´s length size. Collisions are inevitable due to the      key's length being much smaller than the table size.
+
+2. **Hash by Sum:**
+   - Performance: Generally efficient.
+   - Description: The algorithm sums all bytes and then calculates the modulus by the table size, providing a well-distributed hash value.
+
+3. **Hash by XOR:**
+   - Performance: Similar to hash by sum.
+   - Description: This algorithm involves summing byte values, applying bitwise XOR to flip bits, resulting in a less predictable hash value. While similar in cost to hash by sum, it adds a layer of complexity to the key.
+
+## Testing
+
+To test the Hash Table, use the following command line arguments:
+
+```bash
+./a3 -n 240 -H sum -P qua -p data-byname.txt
+
+or 
+
+```bash
+./a3 -p -n 200 -H sum -d deletefile.txt -q querybyname.txt -P qua ./data-byname.txt
+
+For additional information on command line arguments, type:
+```bash
+./a3 -h
 
 
-COST TABLE: (command line argument: ./a3 -n 240 -H <algorithm> -P qua -p  data-byname.txt)
+COST TABLE: ( command line argument: ./a3 -n 240 -H <algorithm> -P qua -p  data-byname.txt )
 algo        value
 
 len         Insertion : 961
@@ -34,6 +57,19 @@ xor         Insertion : 221
             Deletion  : 0
 
 
-All functions in the assignment description have been tested and implemented to work. Assignment is complete.
+COST TABLE: ( command line argument: ./a3 -p -n 200 -H <algorithm> -d deletefile.txt -q querybyname.txt -P qua ./data-byname.txt )
+algo        value
+
+len         Insertion : 1424
+            Search    : 582
+            Deletion  : 429
+
+sum         Insertion : 185
+            Search    : 48
+            Deletion  : 12
+
+xor         Insertion : 236
+            Search    : 123
+            Deletion  : 26
 
 11/12/2023

@@ -1,27 +1,7 @@
-
-##
-## This file builds assignment 3
-##
-
-##
-## Some macros (makefile 'variables') are defined by default
-## by make(1).  The ones relevant to C compiling are:
-##  CC     : the name of the compiler (defaults to system compiler)
-##  CFLAGS : the flags (options) to pass to the compiler
-##
-## There are similar macros for other languages, for example C++ uses
-##  CXX      : the name of the c++ compiler (defaults to system compiler)
-##  CXXFLAGS : the flags (options) to pass to the c++ compiler
-
-
 ## explicitly add debugger support to each file compiled,
-## and turn on all warnings.  If your compiler is surprised by your
-## code, you should be too.
+## and turn on all warnings.
+
 CFLAGS = -g -Wall -Iaalib -I.
-
-## uncomment/change this next line if you need to use a non-default compiler
-#CC = cc
-
 
 ##
 ## We can define variables for values we will use repeatedly below
@@ -53,11 +33,7 @@ $(A3EXE): $(A3OBJS) $(AALIB)
 
 
 ## The ar(1) tool is used to create static libraries.  On Linux
-## this is still the tool to use, however other platforms are
-## moving to the newer libtool(1).  That tool would use a command
-## line like the following
-##
-#	libtool -static -o $(AALIB) $(AALIBOBJS)
+## this is still the tool to use, equivalent to libtool(1). 
 $(AALIB): $(AALIBOBJS)
 	ar rcs $(AALIB) $(AALIBOBJS)
 	

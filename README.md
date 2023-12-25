@@ -30,16 +30,17 @@ To test the Hash Table, use the following command line arguments:
 
 ```bash
 ./a3 -n 240 -H sum -P qua -p data-byname.txt
-
+```
 or 
 
 ```bash
 ./a3 -p -n 200 -H sum -d deletefile.txt -q querybyname.txt -P qua ./data-byname.txt
+```
 
 For additional information on command line arguments, type:
 ```bash
 ./a3 -h
-
+```
 
 COST TABLE: ( command line argument: ./a3 -n 240 -H <algorithm> -P qua -p  data-byname.txt )
 algo        value

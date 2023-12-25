@@ -2,7 +2,7 @@
 
 ## Abstraction
 
-This library provides a back-end Hash Table for efficiently handling data insertion, querying, and deletion from the terminal.
+This program provides a back-end Hash Table library for efficiently handling data insertion, querying, and deletion
 
 ## Summary
 

@@ -43,34 +43,21 @@ For additional information on command line arguments, type:
 ```
 
 COST TABLE: ( command line argument: ./a3 -n 240 -H <algorithm> -P qua -p  data-byname.txt )
-algo        value
 
-len         Insertion : 961
-            Search    : 0
-            Deletion  : 0
-
-sum         Insertion : 153
-            Search    : 0
-            Deletion  : 0
-
-xor         Insertion : 221
-            Search    : 0
-            Deletion  : 0
+| algo  | value        |
+|-------|--------------|
+| len   | Insertion: 961, Search: 0, Deletion: 0 |
+| sum   | Insertion: 153, Search: 0, Deletion: 0 |
+| xor   | Insertion: 221, Search: 0, Deletion: 0 |
 
 
 COST TABLE: ( command line argument: ./a3 -p -n 200 -H <algorithm> -d deletefile.txt -q querybyname.txt -P qua ./data-byname.txt )
-algo        value
 
-len         Insertion : 1424
-            Search    : 582
-            Deletion  : 429
+| algo  | value                            |
+|-------|----------------------------------|
+| len   | Insertion: 1424, Search: 582, Deletion: 429 |
+| sum   | Insertion: 185, Search: 48, Deletion: 12   |
+| xor   | Insertion: 236, Search: 123, Deletion: 26  |
 
-sum         Insertion : 185
-            Search    : 48
-            Deletion  : 12
-
-xor         Insertion : 236
-            Search    : 123
-            Deletion  : 26
 
 11/12/2023

@@ -70,17 +70,11 @@ aaCreateAssociativeArray(
 /**
  * deallocate all the memory in the store -- the keys (which we allocated),
  * and the store itself.
- * The user * code is responsible for managing the memory for the values
+ * The user code is responsible for managing the memory for the values
  */
 void
 aaDeleteAssociativeArray(AssociativeArray *aarray)
 {
-	/**
-	 * TO DO:  clean up the memory managed by our utility
-	 *
-	 * Note that memory for keys are managed, values are the
-	 * responsibility of the user
-	 */
 
 	if (aarray == NULL) 
     {
@@ -136,12 +130,17 @@ int aaIterateAction(
 /** utilities to change names into functions, used in the function above */
 static HashAlgorithm lookupNamedHashStrategy(const char *name)
 {
-	if (strncmp(name, "sum", 3) == 0) {
+	if (strncmp(name, "sum", 3) == 0) 
+	{
 		return hashBySum;
-	} else if (strncmp(name, "len", 3) == 0) {
+	} 
+	
+	else if (strncmp(name, "len", 3) == 0) 
+	{
 		return hashByLength;
-		// TO DO: add in your own strategy here
-	} else if (strncmp(name, "xor", 3)==0){
+	} 
+	
+	else if (strncmp(name, "xor", 3)==0){
 		return hashByXOR;
 	}
 
@@ -149,13 +148,18 @@ static HashAlgorithm lookupNamedHashStrategy(const char *name)
 	return hashBySum;
 }
 
+/** utilities to change names into functions, used in the function above */
 static HashProbe lookupNamedProbingStrategy(const char *name)
 {
 	if (strncmp(name, "lin", 3) == 0) {
 		return linearProbe;
-	} else if (strncmp(name, "qua", 3) == 0) {
+	} 
+	
+	else if (strncmp(name, "qua", 3) == 0) {
 		return quadraticProbe;
-	} else if (strncmp(name, "dou", 3) == 0) {
+	} 
+	
+	else if (strncmp(name, "dou", 3) == 0) {
 		return doubleHashProbe;
 	}
 
@@ -173,14 +177,6 @@ static HashProbe lookupNamedProbingStrategy(const char *name)
  */
 int aaInsert(AssociativeArray *aarray, AAKeyType key, size_t keylen, void *value)
 {
-	/**
-	 * TO DO:  Search for a location where this key can go, stopping
-	 * if we find a value that has been delete and reuse it.
-	 *
-	 * If a suitable location is found, we then initialize that
-	 * slot with the new key and data
-	 */
-    // Initialize the cost counter
 	// Compute the initial hash index using the primary hash function
     HashIndex index = aarray->hashAlgorithmPrimary(key, keylen, aarray->size);
     
@@ -199,7 +195,8 @@ int aaInsert(AssociativeArray *aarray, AAKeyType key, size_t keylen, void *value
 
     while (1) {
         // Check if the current slot is empty (0) or has a tombstone (-1).
-        if (aarray->table[index].validity == HASH_EMPTY || aarray->table[index].validity == HASH_DELETED) {
+        if (aarray->table[index].validity == HASH_EMPTY || aarray->table[index].validity == HASH_DELETED) 
+		{
             // Insert the key, value, and update metadata
             aarray->table[index].key = copiedKey;
             aarray->table[index].keylen = keylen;
@@ -238,10 +235,6 @@ int aaInsert(AssociativeArray *aarray, AAKeyType key, size_t keylen, void *value
  */
 void *aaLookup(AssociativeArray *aarray, AAKeyType key, size_t keylen)
 {
-	/**
-	 * TO DO: perform a similar search to the insert, but here a
-	 * deleted location means we have not found the key
-	 */
 
     HashIndex index = aarray->hashAlgorithmPrimary(key, keylen, aarray->size);
     int startIndex = index;
@@ -270,7 +263,7 @@ void *aaLookup(AssociativeArray *aarray, AAKeyType key, size_t keylen)
         }
 
         // If the current slot doesn't match the key, handle collision
-        //use the same probing strategy as in aaInsert to find the next slot
+        // Use the same probing strategy as in aaInsert to find the next slot
         index++;
 		cost++;
 		aarray->searchCost+= cost;
@@ -298,13 +291,13 @@ void *aaLookup(AssociativeArray *aarray, AAKeyType key, size_t keylen)
 void *aaDelete(AssociativeArray *aarray, AAKeyType key, size_t keylen)
 {
 	/**
-	 * TO DO: Deletion is closely related to lookup;
-	 * you must find where the key is stored before
-	 * you delete it, after all.
+	 * Deletion is closely related to lookup;
+	 * we must find where the key is stored before
+	 * we delete it, after all.
 	 *
-	 * Implement a deletion algorithm based on tombstones,
-	 * as described in class
+	 * Deletion algorithm based on tombstones.
 	 */
+
  HashIndex index = aarray->hashAlgorithmPrimary(key, keylen, aarray->size);
     int startIndex = index;
     int cost = 0;
@@ -341,7 +334,7 @@ void *aaDelete(AssociativeArray *aarray, AAKeyType key, size_t keylen)
         }
 
         // If the current slot doesn't match the key, handle collision (optional):
-        // You can use the same probing strategy as in aaInsert to find the next slot
+        // We can use the same probing strategy as in aaInsert to find the next slot
         index++;
 		cost++;
 		aarray->deleteCost += cost;
@@ -355,31 +348,45 @@ void *aaDelete(AssociativeArray *aarray, AAKeyType key, size_t keylen)
     return NULL;
 }
 
+
 /**
  * Print out the entire aarray contents
  */
+
 void aaPrintContents(FILE *fp, AssociativeArray *aarray, char * tag)
 {
 	char keybuffer[128];
 	int i;
 
 	fprintf(fp, "%sDumping aarray of %d entries:\n", tag, aarray->size);
-	for (i = 0; i < aarray->size; i++) {
+	for (i = 0; i < aarray->size; i++) 
+	{
 		fprintf(fp, "%s  ", tag);
-		if (aarray->table[i].validity == HASH_USED) {
+		if (aarray->table[i].validity == HASH_USED) 
+		{
 			printableKey(keybuffer, 128,
 					aarray->table[i].key,
 					aarray->table[i].keylen);
 			fprintf(fp, "%d : in use : '%s'\n", i, keybuffer);
-		} else {
-			if (aarray->table[i].validity == HASH_EMPTY) {
+		} 
+		
+		else 
+		{
+			if (aarray->table[i].validity == HASH_EMPTY) 
+			{
 				fprintf(fp, "%d : empty (NULL)\n", i);
-			} else if ( aarray->table[i].validity == HASH_DELETED) {
+			} 
+			
+			else if ( aarray->table[i].validity == HASH_DELETED) 
+			{
 				printableKey(keybuffer, 128,
 						aarray->table[i].key,
 						aarray->table[i].keylen);
 				fprintf(fp, "%d : empty (deleted - was '%s')\n", i, keybuffer);
-			} else {
+			} 
+			
+			else 
+			{
 				fprintf(fp, "%d : invalid validity state %d\n", i,
 						aarray->table[i].validity);
 			}
@@ -395,11 +402,16 @@ void aaPrintSummary(FILE *fp, AssociativeArray *aarray)
 {
 	fprintf(fp, "Associative array contains %d entries in a table of %d size\n",
 			aarray->nEntries, aarray->size);
+
 	fprintf(fp, "Strategies used: '%s' hash, '%s' secondary hash and '%s' probing\n",
 			aarray->hashNamePrimary, aarray->hashNameSecondary, aarray->probeName);
+
 	fprintf(fp, "Costs accrued due to probing:\n");
+
 	fprintf(fp, "  Insertion : %d\n", aarray->insertCost);
+
 	fprintf(fp, "  Search    : %d\n", aarray->searchCost);
+	
 	fprintf(fp, "  Deletion  : %d\n", aarray->deleteCost);
 }
 

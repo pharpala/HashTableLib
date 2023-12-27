@@ -12,10 +12,6 @@ static char *stripNonPrinting(char *s);
 
 /**
  * Read in an attribute/value pair from a file
- *
- * QUESTION: where does the memory come from that is being
- * managed in this function.  Is it from the STACK or the HEAP?
- * Where does it get allocated?  Where does it get deallocated?
  */
 int
 readDataLine(
@@ -77,10 +73,6 @@ readDataLine(
 
 /**
  * Read in an attribute/value pair from a file
- *
- * QUESTION: where does the memory come from that is being
- * managed in this function.  Is it from the STACK or the HEAP?
- * Where does it get allocated?  Where does it get deallocated?
  */
 int
 readPlainLine(

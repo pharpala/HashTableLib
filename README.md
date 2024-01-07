@@ -30,7 +30,7 @@ The library supports three algorithms:
 
 ## Testing
 
-1. download HashTableLibrary-main.zip.
+1. Download [Download HashTableLibrary-main.zip](https://github.com/pharpala/HashTableLibrary/archive/main.zip)
 2. Extract the zip file to a location of your choosing.
 3. Open your local computer terminal, and navigate to the HashTableLibrary-main folder location
 4. To test the Hash Table, input the following command line arguments into the terminal:

@@ -23,6 +23,8 @@ AALIBOBJS	= \
 			aalib/hash-table.o \
 			aalib/primes.o
 
+CC = gcc
+
 ##
 ## TARGETS: below here we describe the target dependencies and rules
 ##

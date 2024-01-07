@@ -24,26 +24,35 @@ The library supports three algorithms:
    - Performance: Similar to hash by sum.
    - Description: This algorithm involves summing byte values, applying bitwise XOR to flip bits, resulting in a less predictable hash value. While similar in cost to hash by sum, it adds a layer of complexity to the key.
 
+## Project Specifications
+
+- This project was created and tested using MinGW and the mingw32-make package.
+
 ## Testing
 
-To test the Hash Table, use the following command line arguments:
+1. download HashTableLibrary-main.zip
+2. download the zip file according to your operating system.
+3. Extract the zip file to a location of your choosing.
+4. Open your local computer terminal, and navigate to the HashTableLibrary-main folder location
+5. To test the Hash Table, input the following command line arguments into the terminal:
 
 ```bash
-./a3 -n 240 -H sum -P qua -p data-byname.txt
+./runner -n 240 -H sum -P qua -p data-byname.txt
 ```
-or 
+
+or
 
 ```bash
-./a3 -p -n 200 -H sum -d deletefile.txt -q querybyname.txt -P qua ./data-byname.txt
+./runner -p -n 200 -H sum -d deletefile.txt -q querybyname.txt -P qua ./data-byname.txt
 ```
 
 For additional information on command line arguments, type:
 ```bash
-./a3 -h
+./runner -h
 ```
 
 ## Cost Table: 
-command line argument: ./a3 -n 240 -H &lt;algorithm&gt; -P qua -p  data-byname.txt
+command line argument: ./runner -n 240 -H &lt;algorithm&gt; -P qua -p  data-byname.txt
 
 | algo  | value        |
 |-------|--------------|
@@ -53,13 +62,12 @@ command line argument: ./a3 -n 240 -H &lt;algorithm&gt; -P qua -p  data-byname.t
 
 
 ## Cost Table: 
-command line argument: ./a3 -p -n 200 -H &lt;algorithm&gt; -d deletefile.txt -q querybyname.txt -P qua ./data-byname.txt
+command line argument: ./runner -p -n 200 -H &lt;algorithm&gt; -d deletefile.txt -q querybyname.txt -P qua ./data-byname.txt
 
 | algo  | value                            |
 |-------|----------------------------------|
 | len   | Insertion: 1424, Search: 582, Deletion: 429 |
 | sum   | Insertion: 185, Search: 48, Deletion: 12   |
 | xor   | Insertion: 236, Search: 123, Deletion: 26  |
-
 
 11/12/2023

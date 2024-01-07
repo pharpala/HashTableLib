@@ -50,7 +50,7 @@ aaCreateAssociativeArray(
 	newTable->size = getLargerPrime(size);
 
 	if (newTable->size < 1) {
-		fprintf(stderr, "Cannot create table of size %ld\n", size);
+		fprintf(stderr, "Cannot create table of size %ld\n", (long) size);
 		free(newTable);
 		return NULL;
 	}
